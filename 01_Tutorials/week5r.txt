@@ -1,0 +1,147 @@
+#Using Non-parametric data
+
+boxplot(NumericValues~VectorID, data=abcxyzBox)
+
+boxplot(NumericValues~VectorID, data=abcxyzBox,outline=F)
+attach(abcxyzBox)
+kruskal.test(NumericValues, VectorID)
+
+#pairwise wilcox test
+
+pairwise.wilcox.test(NumericValues, VectorID, p.adjust.method = 'BH')
+
+#dunn test does not come with base R. You will need to install a package for this.
+install.packages("dunn.test")
+library(dunn.test)
+
+dunn.test::dunn.test(NumericValues, VectorID, method = 'bh')  
+
+
+#Pairwise Multiple Comparison of Mean Ranks (PMCMR)
+
+install.packages("PMCMRplus")
+
+library(PMCMRplus)
+
+PMCMRplus::kwAllPairsNemenyiTest(NumericValues, VectorID,method="Tukey",p.adjust.methods=  'BH')  
+
+#Does not auto convert characters to factors
+PMCMRplus::kwAllPairsNemenyiTest(NumericValues, as.factor(VectorID),method="Tukey",p.adjust.methods=  'BH')  
+
+#IMPORTANT WARNING: Use new R packages with caution. They can have "bugs".
+
+#Conover-Iman Test of Multiple Comparisons Using Rank Sums, p.adjust.method is Benjamini-Hochberg
+install.packages("conover.test")
+library(conover.test)
+conover.test::conover.test(NumericValues, VectorID, method = 'bh')
+
+
+######################################################
+#Biostatistics course in R - Week 5
+######################################################
+
+
+LunchAmount<-c(300,154,72,899,1234,36,764,321,540,684)
+TipAmount<-c(30,15,7,89,123,3,76,32,54,68)
+
+plot(LunchAmount,TipAmount,xlab="Lunch Amount",ylab="Tip Amount")
+
+reg_model <- lm(TipAmount~LunchAmount)
+#plotting the regression fit
+abline(reg_model, col="blue")
+summary(reg_model)
+
+a<-data.frame(newdata=40)
+colnames(a)<-"LunchAmount"
+#what is the Tip if cost of lunch is 40 INR?
+predict(reg_model,a)
+
+a<-data.frame(newdata=394)
+colnames(a)<-"LunchAmount"
+#what is the Tip if cost of lunch is 394 INR?
+predict(reg_model,a)
+
+RestaurantClass<-c(2,1,1,3,4,1,2,1,2,2)
+
+reg_model2 <- lm(TipAmount~LunchAmount+RestaurantClass)
+#plotting the regression fit
+abline(reg_model2, col="red")
+summary(reg_model2)
+
+
+reg_model3 <- lm(TipAmount~LunchAmount*RestaurantClass)
+#plotting the regression fit
+abline(reg_model3, col="green")
+summary(reg_model3)
+
+AIC(reg_model)
+AIC(reg_model2)
+AIC(reg_model3)
+
+#null model is the coefficient/intercept is equal to zero
+# A significant result indicates rejection of the null model. Hence, a non-zero coefficient/intercept.
+
+
+#Interest rate, Unemployment Rate and Stock Index Price example
+
+Year <- c(2017,2017,2017,2017,2017,2017,2017,2017,2017,2017,2017,2017,2016,2016,2016,2016,2016,2016,2016,2016,2016,2016,2016,2016)
+Month <- c(12, 11,10,9,8,7,6,5,4,3,2,1,12,11,10,9,8,7,6,5,4,3,2,1)
+Interest_Rate <- c(2.75,2.5,2.5,2.5,2.5,2.5,2.5,2.25,2.25,2.25,2,2,2,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75)
+Unemployment_Rate <- c(5.3,5.3,5.3,5.3,5.4,5.6,5.5,5.5,5.5,5.6,5.7,5.9,6,5.9,5.8,6.1,6.2,6.1,6.1,6.1,5.9,6.2,6.2,6.1)
+Stock_Index_Price <- c(1464,1394,1357,1293,1256,1254,1234,1195,1159,1167,1130,1075,1047,965,943,958,971,949,884,866,876,822,704,719)
+
+data.frame(Year,Month,Interest_Rate,Unemployment_Rate,Stock_Index_Price)->Stock_data
+
+#Check for linearity
+plot(x=Interest_Rate, y=Stock_Index_Price)
+
+plot(x=Unemployment_Rate, y=Stock_Index_Price)
+
+#Multiple linear regression
+model1 <- lm(Stock_Index_Price ~ Interest_Rate + Unemployment_Rate)
+summary(model1)
+
+model2 <- lm(Stock_Index_Price ~ Interest_Rate * Unemployment_Rate)
+summary(model2)
+
+AIC(model1)
+AIC(model2)
+
+#get the ANOVA table from a regression model -- another use of avov function
+aov(model1)->aov_model1
+summary(aov_model1)
+summary(model1)
+
+
+aov(model2)->aov_model2
+summary(aov_model2)
+
+
+#model comparison with anova function
+
+anova(model1,model2)
+
+anova(model2,model1)
+
+#Visualize multiple regression model
+
+##will update R to the latest version
+install.packages("installr")
+library(installr)
+updateR(F, T, T, F, T, F, T)
+
+
+install.packages("devtools")
+devtools::install_github("cardiomoon/ggiraphExtra")
+
+require(ggplot2)
+ggplot(Stock_data,aes(y=Stock_Index_Price,x=Interest_Rate))+geom_point()+geom_smooth(method="lm")
+
+ggplot(Stock_data,aes(y=Stock_Index_Price,x=Unemployment_Rate))+geom_point()+geom_smooth(method="lm")
+
+require(ggiraph)
+require(ggiraphExtra)
+require(plyr)
+
+ggPredict(model1,interactive=TRUE)
+ggPredict(model2,interactive=TRUE)

@@ -1,0 +1,18 @@
+Posting the pokemon dataset here. A list of tasks to perform on this dataset is given below:
+
+-->Download the Pokemon dataset Read the Pokemon dataset into R
+-->Explore the object created in R using class, length, names, colnames, rownames, str, dim, head, tail and summary
+-->Create 10 different subsets of the dataframe in R, use subset function for 5 of the examples
+-->use the plot, points, par, log, hist, abline, boxplot functions to plot the data
+-->Write a simple function in R to calculate something based on the Pokemon dataset
+-->use aggregate, sapply, tapply and apply to use a function on a subset of the data
+-->how would use detach and attach functions?
+-->use shapiro.test, qqplot, hist etc to decide on the type of tests to use
+-->use table, barplot, rbind, cbind, interaction.plot and two way boxplot to tabulate data by two variables
+-->based on your knowledge of Pokemon, formulate hypothesis
+-->demonstrate tabulation and stacked barplot for the pokemon multi variable dataset
+-->Find (and test significance) the character that provides an advantage to each of the following Legendary Pokemon:"Lugia", "Zekrom", "Yveltal", "Xerneas", "Solgaleo", "Dialga"
+-->  use wilcox.test to compare variables, change the alternative hypothesis, paired argument, exact argument, correct argument and subset option
+-->  save the results of wilcox.test in an object and write it to a file using write.table function
+-->  find cor and cov between different vectors in the pokemon dataset
+-->  use linear regression to fit the data, summarize fit, use predict function in R on the linear model

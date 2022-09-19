@@ -1,0 +1,39 @@
+Q. For the given pokemon find the skills in which it's best against the rest#Read the data file
+p<-read.csv('E:/2022/Biostats/pokemon.csv')
+
+#If you observe the data: column 2-20, 24 and 34-36 is of our use
+#Col 31 is tha pokemon name column
+pok_spec<-p[,c(31,2:20,24,34:36)]
+class(pok_spec$capture_rate) = "Numeric"
+sapply(pok_spec,class)
+
+#Finding the maximum value in each of the ability column sliced above
+max_ability<-data.frame(t(sapply(pok_spec[,c(2:24)],max)))
+max_ability <- type.convert(max_ability, as.is = TRUE)
+sapply(max_ability,class)
+
+#Defining the function
+get_best_ability<-function(name)
+{
+  #curr_pok is extracting the data for the passed pokemon name
+  curr_pok<-pok_spec[which(pok_spec$name == name), ][,c(2:24)]
+  i=1
+  #For loop is to compare the value of passed pokemon stats with maximum stats and
+  #it will print if the stats name if it's greater or equal to max_ability
+  for (x in colnames(curr_pok))
+  {
+    if (curr_pok[,i] >= max_ability[,i])
+    {
+      print(x)
+    }
+    i<-i+1
+  }
+}
+
+#Taking sample "Bulbasaur" to get the result
+name="Bulbasaur"
+get_best_ability(name)
+#To verify we can check the values
+curr_pok<-pok_spec[which(pok_spec$name == name), ][,c(2:24)]
+data=rbind(curr_pok,max_ability)
+print(data)

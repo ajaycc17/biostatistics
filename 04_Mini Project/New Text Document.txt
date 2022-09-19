@@ -1,0 +1,64 @@
+See attached files with the miniProject details
+
+###############Example code to read in multiple files into a single large matrix. ###
+
+path <- "C:/Users/Nagarjun/Documents/BIO407/BIO407_BIO627_Mini_Project/CellLine_RNAseq_read_counts/"
+file.names <- dir(path, pattern =".htseq")
+
+assign("Genenames", read.table(paste(path,file.names[15],sep=""),header=FALSE, sep="\t")$V1)
+for(i in 1:length(file.names)){
+temp<-read.table(paste(path,file.names[i],sep=""),header=FALSE, sep="\t")$V2
+Genenames = cbind(Genenames,temp)
+colnames(Genenames)[i+1] <- file.names[i]
+}
+head(Genenames)
+#will show the first few lines of the matrix.
+
+##############Example code to generate dispersion fan diagram for example datasets
+
+library(lattice)
+library(nlme)
+panel.fanplot <- function(x, y, z, zmin, zmax, subscripts, groups,
+                          nmax=max(tapply(z, list(x, y, groups),
+                                          function(x) sum(!is.na(x))), na.rm=T),
+                          ...) {
+ 
+  if(missing(zmin)) zmin <- min(z, na.rm=TRUE)
+  if(missing(zmin)) zmax <- max(z, na.rm=TRUE)
+  get.coords <- function(a, d, x0, y0) {
+    a <- ifelse(a <= 90, 90 - a, 450 - a)
+    data.frame(x = x0 + d * cos(a / 180 * pi),
+               y = y0 + d * sin(a / 180 * pi))
+  }
+ 
+  z.scld <- (z - zmin)/(zmax - zmin) * 360
+  fan <- aggregate(list(z=z.scld[subscripts]),
+                   list(x=x[subscripts], y=y[subscripts]),
+                   function(x)
+                     c(n=sum(!is.na(x)),
+                       quantile(x, c(0.25, 0.5, 0.75), na.rm=TRUE) - 90))
+ 
+  panel.levelplot(fan$x, fan$y,
+                  (fan$z[, '50%'] + 90) / 360 * (zmax - zmin) + zmin,
+                  subscripts=seq_along(fan$x), ...)
+  lapply(which(!is.na(fan$z[, '50%'])), function(i) {
+    with(fan[i, ], {
+      poly <- rbind(c(x, y),
+                    get.coords(seq(z[, '25%'], z[, '75%'], length.out=200),
+                               0.3, x, y))
+      lpolygon(poly$x, poly$y, col='gray10', border='gray10', lwd=3)
+      llines(get.coords(c(z[, '50%'], 180 + z[, '50%']), 0.3, x, y),
+             col='black', lwd=3, lend=1)
+      llines(get.coords(z[, '50%'], c(0.3, (1 - z[, 'n']/nmax) * 0.3), x, y),
+             col='white', lwd=3)
+    })
+  })
+}
+data(MathAchieve)
+MathAchieve$SESfac <- as.numeric(cut(MathAchieve$SES, seq(-2.5, 2, 0.5)))
+MathAchieve$MEANSESfac <- as.numeric(cut(MathAchieve$MEANSES, seq(-1.25, 1, 0.25)))
+levels(MathAchieve$Minority) <- c('Non-minority', 'Minority')
+MathAchieve$group <- as.factor(paste0(MathAchieve$Sex, ', ', MathAchieve$Minority))
+colramp <- colorRampPalette(c('#fff495', '#bbffaa', '#70ffeb', '#72aaff','#bf80ff'))
+
+levelplot(MathAch ~ SESfac*MEANSESfac|group, MathAchieve,groups=group, asp=1, col.regions=colramp,panel=panel.fanplot, zmin=0, zmax=28, at=seq(0, 25, 5),scales=list(alternating=1,tck=c(1, 0),x=list(at=seq(1, 11) - 0.5,labels=seq(-2.5, 2, 0.5)),y=list(at=seq(1, 11) - 0.5, labels=seq(-1.25, 1, 0.25))),between=list(x=1, y=1), strip=strip.custom(bg='gray'),xlab='Socio-economic status of students',ylab='Mean socio-economic status for school')

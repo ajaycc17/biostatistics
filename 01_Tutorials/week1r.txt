@@ -1,0 +1,357 @@
+######################################################
+#Biostatistics course in R - Week 1
+######################################################
+
+#Introduction to R studio ----
+#Some examples are from the website for "R for Data Science"
+#Freely available here: https://r4ds.had.co.nz/
+#Some code is used as is from
+#Hefin Rhys book Machine Learning with R, the tidyverse, and mlr
+######################################################
+
+# R is a glorified calculator
+#
+# using ctrl + enter executes a particular line from the editor
+#
+#Using R console like a calculator
+2 + 4
+2 ^ 4
+2 - 4
+2 * 4
+2 / 4
+2/4
+#Scientific calculator operations
+?cos
+cos(90)
+#inverse of cosine in radians
+cos(90)->cosof90
+acos(cosof90)
+#Constants built into R ----
+pi
+PI
+Pi
+pI
+round(pi,2)
+round(pi,4)
+
+#vector of of constants
+LETTERS
+LETTERS[0]
+LETTERS[1]
+LETTERS[2]
+LETTERS[3]
+LETTERS[200]
+
+c(1:20)->a
+1:20->a
+
+month.name
+
+#convert radians to degree
+acos(cosof90)*180/pi
+
+# writing a simple function to convert
+#radians to degree
+rad2deg<- function(x){
+  x*180/pi
+}
+rad2deg(1)
+
+deg2rad<-function(y){
+  y*pi/180
+}
+deg2rad(90)
+cos(1.57)
+
+as.character(1)
+as.numeric(1)
+
+sumof2numbers<-function(x,y){
+  x+y
+}
+sumof2numbers(2,3)
+
+#write a function to convert marks to letter grades
+
+#Archit's function
+marks2grade <- function(markslist){
+  gradelist <- rep(NA,length(markslist))
+  for (i in 1:length(markslist)){
+    if (markslist[i]<40){
+      gradelist[i] = "F"
+    } else if (markslist[i]<55){
+      gradelist[i] = "D"
+    } else if (markslist[i]<70){
+      gradelist[i] = "C"
+    } else if (markslist[i]<85){
+      gradelist[i] = "B"
+    } else {
+      gradelist[i] = "A"
+    }
+  }
+  print(gradelist)
+}
+
+#Manohar's function
+  convert_grades <- function(x) {
+   
+    if (x >= 90) {
+     
+      x <- "A+"
+     
+    } else if (x >=80 & x < 90) {
+     
+      x <-"A"
+     
+    } else if (x >=70 & x < 80) {
+     
+      x <-"B"
+     
+    } else if (x >=60 & x < 70) {
+     
+      x <-"C"
+     
+    } else if (x >=50 & x < 60) {
+     
+      x <-"D"
+     
+    } else if (x >=40 & x < 50) {
+     
+      x <-"E"
+     
+    } else if (x  <= 39) {
+     
+      x <-"F"
+     
+    }
+   
+    else {
+     
+      x <- NA
+     
+    }
+   
+    return(x)
+   
+  }
+ 
+  convert_grades(57)
+ 
+marks2LetterGrades<-function(markslist){
+#  markslist<-c(34,36,60,61,70,71,80,81,90,91,100,0,101)
+  markslist[markslist>=90 & markslist<=100]<-rep("A",length(markslist[markslist>=90 & markslist<=100]))
+  markslist[markslist>=70 & markslist<90]<-rep("B",length(markslist[markslist>=70 & markslist<90]))
+  markslist[markslist>=60 & markslist<70]<-rep("C",length(markslist[markslist>=60 & markslist<70]))
+  markslist[markslist>=35 & markslist<60]<-rep("D",length(markslist[markslist>=35 & markslist<60]))
+  markslist[markslist>0 & markslist<35]<-rep("F",length(markslist[markslist>0 & markslist<35]))
+  markslist[markslist<1]<-rep("I",length(markslist[markslist<1]))
+  markslist
+}
+
+marks2LetterGrades(c(34,36,92,60,61,70,71,80,81,90,91,100,100,0,100,1,10))->xyz_grades
+
+View(xyz_grades)
+
+#https://cran.r-project.org/web/packages/ProfessR/vignettes/Grader.pdf
+install.packages("ProfessR")
+library("ProfessR")
+
+g = rnorm(n=200, m=82, sd=10)
+g[g>100] = 100
+g[g<1] = 1
+
+boxplot(g)
+
+B = boxplot(g, plot=FALSE)
+
+#diff function returns suitably lagged and iterated differences.
+divs = c(min(g), B$stats[1:4] + diff(B$stats)/2, max(g) )
+
+library(ProfessR)
+D1 = do.grades(g, divs=divs, tit="BIO407 Grades")
+
+#
+# CREATING OBJECTS in R ----
+a <- 10 * 6
+a<-6
+6->a
+a
+
+A <- 2 + 6 # CASE SENSISTIVE
+A
+a
+
+# OVERWRITING OBJECTS ----
+a <- 0
+a
+
+# NAMING OBJECTS ----
+1object <- 3
+!object <- 3
+-object <- 3
+object1 <- 3
+object! <- 3
+my object <-3
+
+my.object <- 3
+my_object <- 3
+myObjectIsThis <- 3
+
+#REMOVING OBJECTS ----
+rm(a)
+rm(object1)
+
+# DATA CLASSES ----
+12.6    # NUMERIC
+"Male"  # CHARACTER
+TRUE    # LOGICAL
+
+# DATA STRUCTURES ----
+# VECTOR
+c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+c(1:10)
+c("Mon", "Tue", "Wed", "Thur", "Fri")
+c(Mon, Tue, Wed, Thur, Fri)           # CHARACTER STRINGS MUST BE IN QUOTES
+c(FALSE, TRUE, TRUE, FALSE, FALSE)
+c(false, true)                        # LOGICAL MUST BE IN CAPITALS
+myVector <- c(F, F, F, T, T)          # BUT CAN BE ABBREVIATED
+myVector
+numbers <- c(1:10)
+numbers * 2                           # OPERATIONS CAN BE PERFORMED ON VECTORS
+numbers + 3
+numbers + numbers
+
+# LIST
+list(1, 2, 3, "hello", FALSE)
+list(myVector, 1, 2, 3, "hello", FALSE) # LISTS CAN CONTAIN LISTS AND VECTORS
+list(myVector, c(1, 2, 3), "hello", FALSE)
+
+# DATA.FRAME (COME BACK TO)
+# MENTION MATRICES AND ARRAYS BRIEFLY
+
+# SUBSETTING VECTORS ----
+days <- c("Mon", "Tue", "Wed", "Thur", "Fri")
+days
+days[1]
+days[4]
+days[c(1, 3, 4)]
+days[1:4]
+days[-5]
+# FUNCTIONS ----
+myValues <- c(1:100)
+myValues
+mean(myValues)
+median(myValues)
+min(myValues)
+max(myValues)
+sum(myValues)
+sd(myValues)
+class(myValues)
+length(myValues) # SOME FUNCTIONS RETURN SINGLE VALUES (AGGREGATE FUNCTIONS)
+log(myValues)    # OTHERS RETURN A VALUE FOR EACH COMPONENT OF THE VECTOR
+log10(myValues)  # CAREFUL: DIFFERENCE BETWEEN LOG10 AND LOG
+mySqrt <- sqrt(myValues)
+mySqrt
+?rnorm           # HELP ON HOW TO USE A FUNCTION
+rnorm(100, mean = 5)
+hist(rnorm(100, mean = 5))
+hist(rnorm(100, mean = 58))
+
+# DATA.FRAMES ----
+id <- (1:200)
+group <- c(rep("Vehicle", 100), rep("Drug", 100))
+group2<-rep(c(rep("vehicle",50),rep("drug",50)),2)
+response <- c(rnorm(100, mean = 25, sd = 5), rnorm(100, mean = 23, sd = 5))
+myData <- data.frame(Patient = id, Treatment = group, Response = response)
+myData # CTRL+L
+head(myData) # REMIND DATA WILL BE DIFFERENT BECAUSE OF RANDOM SEED
+head(myData, 12)
+tail(myData, 10)
+dim(myData)
+str(myData)
+summary(myData)
+
+# SUBSETTING DATA.FRAMES ----
+myData[1, 2] #[ROWS, COLUMNS]
+myData[2, 3]
+myData[1:20, 2:3]
+myData[1:20, ]
+myData[, 3]
+myData[, "Response"]
+myData$Response
+myData[myData$Response > 26, ]
+myData[myData$Treatment == "Vehicle" & myData$Response <= 23, ]
+myData[myData$Treatment == "Vehicle" | myData$Response >= 21, ]
+myData[myData$Treatment != "Vehicle" | myData$Response > 24, ]
+age <- round(rnorm(200, mean = 40, sd = 20))
+myData$Age <- age
+head(myData)
+
+# READING DATA INTO R ----
+#Goto the correct directory
+getwd()
+
+setwd("E:\Courses\Biostatistics\GapMinderData")#This will not work
+setwd("E:/Courses/Biostatistics/GapMinderData")#But this will work
+
+getwd()
+
+lifeExpectancyInYears <- read.csv("life_expectancy_years.csv", header = T)
+
+
+dim(lifeExpectancyInYears)
+head(lifeExpectancyInYears)
+str(lifeExpectancyInYears)
+summary(lifeExpectancyInYears)
+
+#Using column names as it is
+lifeExpectancyInYears <- read.csv("life_expectancy_years.csv", header = T, check.names = FALSE)
+
+# Plotting Data ---
+plot(lifeExpectancyInYears[,2])
+
+plot(as.vector(unlist(lifeExpectancyInYears[162,2:302])),
+     as.vector(unlist(colnames(lifeExpectancyInYears)[2:302]))
+     ,xlab="Life expectancy in years", ylab="Year")
+
+
+plot(lifeExpectancyInYears[,2],lifeExpectancyInYears[,101])
+plot(lifeExpectancyInYears[,2],lifeExpectancyInYears[,3],xlab="1800", ylab="1801")
+
+plot(as.vector(unlist(lifeExpectancyInYears[162,2:302])),as.vector(unlist(lifeExpectancyInYears[3,2:302])))
+
+#subset to life expectancy in Sweden
+lifeExpectancyInYears[lifeExpectancyInYears$country=="Sweden",]
+
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="Sweden",])))->SwedenLife
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="India",])))->IndiaLife
+
+par(mfrow=c(1,2))
+hist(SwedenLife)
+hist(IndiaLife)
+
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="Bangladesh",])))->BanglaLife
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="Australia",])))->AussieLife
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="China",])))->ChinaLife
+
+
+plot(c(1800:2100),SwedenLife,col="red",main="Life Expectancy in Years",pch=15,ylim=c(0,100),xlab="Years",ylab="Age")
+points(c(1800:2100),IndiaLife,col="blue")
+points(c(1800:2100),BanglaLife,col="green")
+points(c(1800:2100),AussieLife,col="black")
+points(c(1800:2100),ChinaLife,col="yellow")
+
+legend(x = "topleft",          # Position
+       legend = c("Sweden", "India", "Bangladesh", "Australia", "China"),  # Legend texts
+       fill = c("red", "blue","green", "black", "yellow"))              # Colors
+
+abline(v=2000)
+abline(v=2020)
+
+abline(h=20)
+
+
+par(mfrow=c(3,3))
+plot(c(1800:2100),SwedenLife,col="red",pch=15,ylim=c(0,100),xlab="Years",ylab="Age")
+plot(c(1800:2100),IndiaLife,col="blue")
+plot(c(1800:2100),BanglaLife,col="green")

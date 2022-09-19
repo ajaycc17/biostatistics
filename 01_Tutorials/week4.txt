@@ -1,0 +1,265 @@
+######################################################
+#Biostatistics course in R - Week 4
+######################################################
+
+plot(gapminder_unfiltered)
+
+boxplot(lifeExp~continent, data=gapminder_unfiltered)
+
+plot(lifeExp~log(gdpPercap),col=gdpPercap,data=gapminder_unfiltered)
+
+#tabulation
+tabulation <- table(gapminder$continent)
+barplot(tabulation)
+# cross tabulation
+table(gapminder$year, gapminder$continent)->crossTab
+barplot(crossTab)
+barplot(crossTab,beside=TRUE,col=c("red","blue","green","yellow",
+                                   "brown","pink","grey","black"))
+       
+#comparing more than 2 vectors ----
+x = rnorm(10,sd=10,mean=5)
+y = rnorm(10,sd=10,mean=6)
+z = rnorm(10,sd=10,mean=7)
+
+data.frame(values=c(x,y,z)
+           ,variable=c(rep("x",length(x)),rep("y",length(y)),
+                      rep("z",length(z))))->xyzBox
+
+boxplot(xyzBox$values~xyzBox$variable)
+
+
+a = rnorm(10,sd=10,mean=50)
+b = rnorm(10,sd=10,mean=6)
+c = rnorm(10,sd=10,mean=7)
+
+data.frame(values=c(a,b,c)
+           ,variable=c(rep("a",length(a)),rep("b",length(b)),
+                       rep("c",length(c))))->abcBox
+
+boxplot(abcBox$values~abcBox$variable)
+
+#rbind will append the rows
+rbind(abcBox,xyzBox)->abcxyzBox
+boxplot(abcxyzBox$values~abcxyzBox$variable)
+
+#One way ANOVA
+res.aov <- aov(values ~ variable, data = abcxyzBox)
+#Null hypothesis: All groups have the same mean
+res.aov
+summary(res.aov)
+#Alternative hypothesis:All groups don't have the same mean
+
+res.aov <- aov(values ~ variable, data = xyzBox)
+res.aov
+summary(res.aov)
+
+res.aov <- aov(values ~ variable, data = abcBox)
+res.aov
+summary(res.aov)
+
+#Pairwise TukeyHSD ----
+TukeyHSD(res.aov)
+
+##########################
+#Parametric assumptions
+##########################
+#Normality: Data have a normal distribution (or at least is symmetric)
+#---histogram
+#---shapiro test
+#---Q-Q plot
+#Homogeneity of variances: Data from multiple groups have the same variance
+#---levene test
+#---check normality of the residuals distribution
+#Linearity: Data have a linear relationship - for correlation tests
+#Independence: Data are independent
+#No Outliers: There should be no extreme outliers.
+
+# 1. Homogeneity of variances
+plot(res.aov, 1)
+
+install.packages("car")
+library(car)
+?leveneTest
+leveneTest(values ~ variable, data = abcBox)
+#Null hypothesis: the population variances are equal
+
+a = rnorm(10,sd=100,mean=6)
+b = rnorm(10,sd=10,mean=6)
+c = rnorm(10,sd=10,mean=6)
+
+data.frame(values=c(a,b,c)
+           ,variable=c(rep("a",length(a)),rep("b",length(b)),
+                       rep("c",length(c))))->abcBox
+
+leveneTest(values ~ variable, data = abcBox)
+#Null hypothesis: the population variances are equal
+
+# 2. Normality
+plot(res.aov, 2)
+
+# Extract the residuals
+aov_residuals <- residuals(object = res.aov )
+# Run Shapiro-Wilk test
+shapiro.test(x = aov_residuals )
+
+#one way anova when variances are different
+oneway.test(abcxyzBox$values~abcxyzBox$variable)
+
+oneway.test(xyzBox$values~xyzBox$variable)
+oneway.test(abcBox$values~abcBox$variable)
+
+#Pairwise t-test
+pairwise.t.test(abcxyzBox$values,abcxyzBox$variable,
+                p.adjust.method = "BH")
+
+
+pairwise.t.test(xyzBox$values,xyzBox$variable,
+                p.adjust.method = "BH")
+pairwise.t.test(abcBox$values,abcBox$variable,
+                p.adjust.method = "BH")
+
+pairwise.t.test(abcBox$values,abcBox$variable,
+                p.adjust.method = "holm")
+
+pairwise.t.test(abcBox$values,abcBox$variable,
+                p.adjust.method = "hochberg")
+
+pairwise.t.test(abcBox$values,abcBox$variable,
+                p.adjust.method = "hommel")
+
+pairwise.t.test(abcBox$values,abcBox$variable,
+                p.adjust.method = "bonferroni")
+
+pairwise.t.test(abcBox$values,abcBox$variable,
+                p.adjust.method = "BY")
+
+pairwise.t.test(abcBox$values,abcBox$variable,
+                p.adjust.method = "fdr")
+
+pvalues<-c(0.1,0.01,0.02,0.045,0.0001,0.009,0.0099,0.7)
+pvalues2<-c(0.01,0.02,0.045,0.0001,0.009,0.0099)
+
+p.adjust(pvalues2,method="BH")
+
+?pairwise.t.test
+
+#Testing equality of variance
+#Compute F-test in R
+
+x = rnorm(10,sd=10,mean=5)
+y = rnorm(10,sd=100,mean=5)
+
+var.test(x, y, alternative = "two.sided")
+
+data.frame(values=c(x,y),groups=c(rep("x",length(x)),rep("y",length(y))))->data
+# using values stored in a data frame
+var.test(values ~ groups, data, alternative = "two.sided")
+
+
+x = rnorm(10,sd=10)
+y = rnorm(10,sd=100)
+
+var.test(x, y, alternative = "two.sided")
+#one-tailed tests for variance
+var.test(x, y, alternative = "less")
+var.test(x, y, alternative = "greater")
+
+
+#Non-parametric test for more than 2 variables
+
+a = rnorm(10,sd=10,mean=50)
+b = rnorm(10,sd=10,mean=6)
+c = rnorm(10,sd=10,mean=7)
+
+data.frame(values=c(a,b,c)
+           ,variable=c(rep("a",length(a)),rep("b",length(b)),
+                       rep("c",length(c))))->abcBox
+
+boxplot(abcBox$values~abcBox$variable)
+#non-parametric test for more than 2 continuous variables
+kruskal.test(abcBox$values~abcBox$variable)
+oneway.test(abcBox$values~abcBox$variable)
+
+
+x = rnorm(10,sd=10,mean=5)
+y = rnorm(10,sd=10,mean=6)
+z = rnorm(10,sd=10,mean=7)
+
+data.frame(values=c(x,y,z)
+           ,variable=c(rep("x",length(x)),rep("y",length(y)),
+                       rep("z",length(z))))->xyzBox
+
+boxplot(xyzBox$values~xyzBox$variable)
+
+kruskal.test(xyzBox$values~xyzBox$variable)
+
+# what would be the code to test India, Sweden and Bangladesh together?
+
+setwd("E:/Courses/Biostatistics/GapMinderData")#But this will work
+
+lifeExpectancyInYears <- read.csv("life_expectancy_years.csv", header = T, check.names = FALSE)
+
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="Sweden",])))->SwedenLife
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="India",])))->IndiaLife
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="Bangladesh",])))->BanglaLife
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="Australia",])))->AussieLife
+na.omit(as.numeric(unlist(lifeExpectancyInYears[lifeExpectancyInYears$country=="China",])))->ChinaLife
+
+data.frame(values=c(SwedenLife,IndiaLife,BanglaLife,AussieLife,ChinaLife)
+           ,variable=c(rep("Sweden",length(SwedenLife)),rep("India",length(IndiaLife)),
+                       rep("Bangladesh",length(BanglaLife)),
+                       rep("Australia",length(AussieLife)),
+                       rep("China",length(ChinaLife))))->countryBox
+
+boxplot(countryBox$values~countryBox$variable)
+
+kruskal.test(countryBox$values~countryBox$variable)
+
+pairwise.wilcox.test(countryBox$values,countryBox$variable)
+
+#Two way ANOVA ----
+#add another grouping vector to abcxyzBox
+
+rbind(abcBox,xyzBox)->abcxyzBox
+boxplot(abcxyzBox$values~abcxyzBox$variable)
+
+grouping2classes<-c("India","Mandya","Paniput","Amravati","Kanpur","Baroda")
+
+Season<-c("Summer","Winter","Monsoon","Spring","Autumn")
+
+sample(grouping2classes, length(abcxyzBox$variable),replace=TRUE)->grouping2random
+abcxyzBox$grouping2random<-grouping2random
+
+sample(Season, length(abcxyzBox$variable),replace=TRUE)->Season2random
+abcxyzBox$Season2random<-Season2random
+
+boxplot(values~variable, data=abcxyzBox)
+boxplot(values~grouping2random, data=abcxyzBox)
+
+#boxplot with two factors
+boxplot(values ~ variable * grouping2random, data=abcxyzBox, frame = FALSE,las=2,
+        col = c("red","blue","green","orange","yellow","brown"))
+
+# Two-way interaction plot
+interaction.plot(x.factor = abcxyzBox$variable, trace.factor = abcxyzBox$grouping2random,
+                 response = abcxyzBox$values, fun = mean,
+                 type = "b")
+
+res.aov2 <- aov(values ~ variable + grouping2random, data = abcxyzBox)
+summary(res.aov2)
+
+# Two-way ANOVA with interaction effect
+# These two calls are equivalent
+res.aov3 <- aov(values ~ variable * grouping2random, data = abcxyzBox)
+res.aov3 <- aov(values ~ variable + grouping2random + variable:grouping2random, data = abcxyzBox)
+summary(res.aov3)
+
+res.aov4 <- aov(values ~ variable * grouping2random * Season2random, data = abcxyzBox)
+summary(res.aov4)
+
+res.aov4 <- aov(NumericValues ~ VectorID * City * Season, data = abcxyzBox)
+summary(res.aov4)
+
+TukeyHSD(res.aov3, which = "variable")
+TukeyHSD(res.aov3, which = "grouping2random")
